@@ -12,3 +12,4 @@ class Task(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     content: Mapped[str] = mapped_column(nullable=False)
     timestamp: Mapped[str] = mapped_column(nullable=False)
+    is_done: Mapped[bool] = mapped_column(nullable=False, default=False)

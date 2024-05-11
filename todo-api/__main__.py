@@ -6,17 +6,19 @@ from .model.base import engine
 from .model.base import Base
 from .model.task import Task
 from datetime import datetime
-from dataclasses import asdict
+from dataclasses import asdict, dataclass
 import uvicorn
 
 
 Base.metadata.create_all(bind=engine, checkfirst=True)
 
 
+@dataclass
 class ToDo(BaseModel):
-    """JSON POST todo content"""
+    """JSON POST/PUT todo content"""
 
     content: str
+    is_done: bool
 
 
 app = FastAPI()
@@ -41,8 +43,19 @@ async def get_task(task_id: int):
 
 @app.post("/task")
 async def add_task(task: ToDo):
-    """Add a new task"""
-    session.add(Task(content=task.content, timestamp=datetime.now().isoformat()))
+    """Add a new undone task"""
+    session.add(
+        Task(content=task.content, timestamp=datetime.now().isoformat(), is_done=False)
+    )
+    session.commit()
+
+
+@app.put("/task/{task_id}")
+async def update_task(task_id: int, task: ToDo):
+    """Update the task specified by the given id"""
+    chosen_entity = session.execute(select(Task).where(Task.id == task_id)).scalar_one()
+    chosen_entity.content = task.content
+    chosen_entity.is_done = task.is_done
     session.commit()
 
 
