@@ -41,7 +41,7 @@ async def get_task(task_id: int):
     return asdict(chosen_entity)
 
 
-@app.post("/task")
+@app.post("/tasks")
 async def add_task(task: ToDo):
     """Add a new undone task"""
     session.add(
@@ -50,7 +50,7 @@ async def add_task(task: ToDo):
     session.commit()
 
 
-@app.put("/task/{task_id}")
+@app.put("/tasks/{task_id}")
 async def update_task(task_id: int, task: ToDo):
     """Update the task specified by the given id"""
     chosen_entity = session.execute(select(Task).where(Task.id == task_id)).scalar_one()
